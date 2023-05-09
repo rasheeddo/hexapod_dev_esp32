@@ -2,6 +2,12 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <hexapod_lib.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BNO055.h>
+#include <utility/imumaths.h>
+#include <PID_v1.h>
+
+Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28, &Wire);
 
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
 
@@ -31,6 +37,7 @@ uint16_t sbus_ch[16];
 uint16_t ch1;
 uint16_t ch2;
 uint16_t ch4;
+uint16_t ch5;
 uint16_t ch7;
 uint16_t ch8;
 int sbus_max = 1680;
@@ -54,6 +61,7 @@ bool do_smooth = false;
 bool stick_ch1_pressed = false;
 bool stick_ch2_pressed = false;
 bool stick_ch4_pressed = false;
+bool stick_ch5_pressed = false;
 bool sticks_pressed = false;
 int max_delay = 50;
 int min_delay = 10;
@@ -78,6 +86,28 @@ float leg4_XYZ[3];
 float leg5_XYZ[3];
 float leg6_XYZ[3];
 
+//////////////
+/// BNO055 ///
+//////////////
+float qw;
+float qx;
+float qy;
+float qz;
+float r11, r12, r13, r21, r22, r23, r31, r32, r33;
+float imu_roll, imu_pitch, body_yaw;
+float comp_roll, comp_pitch;
+
+/// PID ///
+double Setpoint = 0.0;
+double PIDRollInput, PIDRollOutput;
+double PIDPitchInput, PIDPitchOutput;
+double kp = 1.5; 
+double ki = 3.0; 
+double kd = 0.001;
+double pid_out_min = -25.0;
+double pid_out_max = 25.0;
+PID bodyRollPID(&PIDRollInput, &PIDRollOutput, &Setpoint, kp, ki, kd, DIRECT);
+PID bodyPitchPID(&PIDPitchInput, &PIDPitchOutput, &Setpoint, kp, ki, kd, DIRECT);
 
 ////////////////////////////
 /// PWM Global variables ///
@@ -136,6 +166,22 @@ int pwm3_6_prev;
 void setup() {
   
   Serial.begin(115200);
+  
+  /// BNO055 setup//
+  if (!bno.begin())
+  {
+    /* There was a problem detecting the BNO055 ... check your connections */
+    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    while (1);
+  }
+  delay(1000);
+  bno.setExtCrystalUse(true);
+
+  /// PID ///
+  bodyRollPID.SetMode(AUTOMATIC);
+  bodyRollPID.SetOutputLimits(pid_out_min, pid_out_max);
+  bodyPitchPID.SetMode(AUTOMATIC);
+  bodyPitchPID.SetOutputLimits(pid_out_min, pid_out_max);
 
   /// SBUS parser thread ///
   uart_config_t uart2_config = {
@@ -180,10 +226,34 @@ void loop() {
   // copy sbus values from "ch" to "sbus_ch"
   memcpy(sbus_ch, ch, sizeof(ch));
 
+  // get data from BNO055 //
+  sensors_event_t event;
+  bno.getEvent(&event);
+
+  imu::Quaternion quat = bno.getQuat();
+  qw = quat.w();
+  qx = quat.x();
+  qy = quat.y();
+  qz = quat.z();
+  r11 = pow(qw,2) + pow(qx,2) - pow(qy,2) - pow(qz,2); 
+  r12 = 2*qx*qy - 2*qz*qw;
+  r13 = 2*qx*qz + 2*qy*qw;
+  r21 = 2*qx*qy + 2*qz*qw;
+  r22 = pow(qw,2) - pow(qx,2) + pow(qy,2) - pow(qz,2); 
+  r23 = 2*qy*qz - 2*qx*qw;
+  r31 = 2*qx*qz - 2*qy*qw;
+  r32 = 2*qy*qz + 2*qx*qw;
+  r33 = pow(qw,2) - pow(qx,2) - pow(qy,2) + pow(qz,2); 
+
+  imu_roll = atan2(r32, r33) * RAD2DEG;
+  imu_pitch = asin(-r31) * RAD2DEG;
+  body_yaw = atan2(-r21, r11) * RAD2DEG;
+
   // we're using 5 channels 
   ch1 = sbus_ch[0];
   ch2 = sbus_ch[1];
   ch4 = sbus_ch[3];
+  ch5 = sbus_ch[4];
   ch7 = sbus_ch[6];
   ch8 = sbus_ch[7];
 
@@ -201,8 +271,9 @@ void loop() {
   stick_ch1_pressed = ((ch1 > sbus_db_max) || (ch1 < sbus_db_min));
   stick_ch2_pressed = ((ch2 > sbus_db_max) || (ch2 < sbus_db_min));
   stick_ch4_pressed = ((ch4 > sbus_db_max) || (ch4 < sbus_db_min));
+  stick_ch5_pressed = ch5 < 1500;
   
-  sticks_pressed =  (stick_ch1_pressed || stick_ch2_pressed || stick_ch4_pressed);
+  sticks_pressed =  (stick_ch1_pressed || stick_ch2_pressed || stick_ch4_pressed || stick_ch5_pressed);
                    
   //////////////////////
   /// Normal walking ///
@@ -339,7 +410,20 @@ void loop() {
       if (ch8 > 1500){
         XYZ_to_PWM(x_trans, y_trans, z_trans);
       } else {
-        RPY_to_PWM(roll, pitch, yaw);
+        if (ch5 > 1500){
+          RPY_to_PWM(roll, pitch, yaw);
+        } else{
+          //comp_roll = -constrain(imu_pitch, -15.0, 15.0);
+          //comp_pitch = constrain(imu_roll, -15.0, 15.0);
+          PIDRollInput = -imu_pitch;
+          PIDPitchInput = imu_roll;
+          bodyRollPID.Compute();
+          bodyPitchPID.Compute();
+          
+//          RPY_to_PWM(PIDRollOutput, 0.0, 0.0);
+          RPY_to_PWM(PIDRollOutput, PIDPitchOutput, 0.0);
+        }
+        
       }
     }
     
@@ -446,32 +530,51 @@ void loop() {
 //  Serial.print(ch4);
 //  Serial.print(" ch7 ");
 //  Serial.print(ch7);
-//  Serial.print(" ch8 ");
-//  Serial.print(ch8);
-  Serial.print(" smooth ");
-  Serial.print(do_smooth);
-  Serial.print(" count ");
-  Serial.print(counter);
-  Serial.print(" delay ");
-  Serial.print(delay_time);
-  Serial.print(" ang_in ");
-  Serial.print(ang_inc);
-  Serial.print(" turn_in ");
-  Serial.print(turn_inc);
-  Serial.print(" str_in ");
-  Serial.println(str_index);
+//  Serial.print(" ch5 ");
+//  Serial.print(ch5);
+//  Serial.print(" smooth ");
+//  Serial.print(do_smooth);
+//  Serial.print(" count ");
+//  Serial.print(counter);
+//  Serial.print(" delay ");
+//  Serial.print(delay_time);
+//  Serial.print(" ang_in ");
+//  Serial.print(ang_inc);
+//  Serial.print(" turn_in ");
+//  Serial.print(turn_inc);
+//  Serial.print(" str_in ");
+//  Serial.print(str_index);
+//  Serial.print(" r ");
+//  Serial.print(roll);
+//  Serial.print(" p ");
+//  Serial.print(pitch);
+//  Serial.print(" yw ");
+//  Serial.print(yaw);
+  Serial.print("   imu_roll: ");
+  Serial.print(imu_roll, 2);
+  Serial.print(" imu_pitch: ");
+  Serial.print(imu_pitch, 2);
+  Serial.print(" pid_in_roll ");
+  Serial.print( PIDRollInput);
+  Serial.print(" pid_out_roll ");
+  Serial.print( PIDRollOutput);
+  Serial.print(" pid_in_pitch ");
+  Serial.print( PIDPitchInput);
+  Serial.print(" pid_out_pitch ");
+  Serial.println( PIDPitchOutput);
+//  Serial.print(" body_yaw: ");
+//  Serial.print(body_yaw, 2);
+//  Serial.print("   comp_roll: ");
+//  Serial.print(comp_roll, 2);
+//  Serial.print(" comp_pitch: ");
+//  Serial.println(comp_pitch, 2);
 //  Serial.print(" x ");
 //  Serial.print(x_trans);
 //  Serial.print(" y ");
 //  Serial.print(y_trans);
 //  Serial.print(" z ");
 //  Serial.print(z_trans);
-//  Serial.print(" r ");
-//  Serial.print(roll);
-//  Serial.print(" p ");
-//  Serial.print(pitch);
-//  Serial.print(" yw ");
-//  Serial.println(yaw);
+
   
 //  delay(1);
 }

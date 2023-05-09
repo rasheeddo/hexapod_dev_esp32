@@ -356,85 +356,16 @@ void HexapodLib::generate_crabWalkingLUT(){
 	float y_arr[DATA_POINT_ALL];
 	float z_arr[DATA_POINT_ALL];
 
-	// float x1_arr[DATA_POINT_ALL];
-	// float y1_arr[DATA_POINT_ALL];
-	// float z1_arr[DATA_POINT_ALL];
-
-	// float x2_arr[DATA_POINT_ALL];
-	// float y2_arr[DATA_POINT_ALL];
-	// float z2_arr[DATA_POINT_ALL];
-
-	// float x3_arr[DATA_POINT_ALL];
-	// float y3_arr[DATA_POINT_ALL];
-	// float z3_arr[DATA_POINT_ALL];
-
-	// float x4_arr[DATA_POINT_ALL];
-	// float y4_arr[DATA_POINT_ALL];
-	// float z4_arr[DATA_POINT_ALL];
-
-	// float x5_arr[DATA_POINT_ALL];
-	// float y5_arr[DATA_POINT_ALL];
-	// float z5_arr[DATA_POINT_ALL];
-
-	// float x6_arr[DATA_POINT_ALL];
-	// float y6_arr[DATA_POINT_ALL];
-	// float z6_arr[DATA_POINT_ALL];
 
 	float the1[DATA_POINT_ALL];
 	float the2[DATA_POINT_ALL];
 	float the3[DATA_POINT_ALL];
 
-	// float the1_1[DATA_POINT_ALL];
-	// float the2_1[DATA_POINT_ALL];
-	// float the3_1[DATA_POINT_ALL];
-
-	// float the1_2[DATA_POINT_ALL];
-	// float the2_2[DATA_POINT_ALL];
-	// float the3_2[DATA_POINT_ALL];
-
-	// float the1_3[DATA_POINT_ALL];
-	// float the2_3[DATA_POINT_ALL];
-	// float the3_3[DATA_POINT_ALL];
-
-	// float the1_4[DATA_POINT_ALL];
-	// float the2_4[DATA_POINT_ALL];
-	// float the3_4[DATA_POINT_ALL];
-
-	// float the1_5[DATA_POINT_ALL];
-	// float the2_5[DATA_POINT_ALL];
-	// float the3_5[DATA_POINT_ALL];
-
-	// float the1_6[DATA_POINT_ALL];
-	// float the2_6[DATA_POINT_ALL];
-	// float the3_6[DATA_POINT_ALL];
 
 	int pwm1[DATA_POINT_ALL];
 	int pwm2[DATA_POINT_ALL];
 	int pwm3[DATA_POINT_ALL];
 
-	// int pwm1_1[DATA_POINT_ALL];
-	// int pwm2_1[DATA_POINT_ALL];
-	// int pwm3_1[DATA_POINT_ALL];
-
-	// int pwm1_2[DATA_POINT_ALL];
-	// int pwm2_2[DATA_POINT_ALL];
-	// int pwm3_2[DATA_POINT_ALL];
-
-	// int pwm1_3[DATA_POINT_ALL];
-	// int pwm2_3[DATA_POINT_ALL];
-	// int pwm3_3[DATA_POINT_ALL];
-
-	// int pwm1_4[DATA_POINT_ALL];
-	// int pwm2_4[DATA_POINT_ALL];
-	// int pwm3_4[DATA_POINT_ALL];
-
-	// int pwm1_5[DATA_POINT_ALL];
-	// int pwm2_5[DATA_POINT_ALL];
-	// int pwm3_5[DATA_POINT_ALL];
-
-	// int pwm1_6[DATA_POINT_ALL];
-	// int pwm2_6[DATA_POINT_ALL];
-	// int pwm3_6[DATA_POINT_ALL];
 
 	float ang_inc = 0;
 	for (int i=0; i<cw_array_length; i++){
@@ -1266,85 +1197,13 @@ void HexapodLib::generate_normalWalking_LUT(){
 	float y_arr[DATA_POINT_ALL];
 	float z_arr[DATA_POINT_ALL];
 
-	// float x1_arr[DATA_POINT_ALL];
-	// float y1_arr[DATA_POINT_ALL];
-	// float z1_arr[DATA_POINT_ALL];
-
-	// float x2_arr[DATA_POINT_ALL];
-	// float y2_arr[DATA_POINT_ALL];
-	// float z2_arr[DATA_POINT_ALL];
-
-	// float x3_arr[DATA_POINT_ALL];
-	// float y3_arr[DATA_POINT_ALL];
-	// float z3_arr[DATA_POINT_ALL];
-
-	// float x4_arr[DATA_POINT_ALL];
-	// float y4_arr[DATA_POINT_ALL];
-	// float z4_arr[DATA_POINT_ALL];
-
-	// float x5_arr[DATA_POINT_ALL];
-	// float y5_arr[DATA_POINT_ALL];
-	// float z5_arr[DATA_POINT_ALL];
-
-	// float x6_arr[DATA_POINT_ALL];
-	// float y6_arr[DATA_POINT_ALL];
-	// float z6_arr[DATA_POINT_ALL];
-
 	float the1[DATA_POINT_ALL];
 	float the2[DATA_POINT_ALL];
 	float the3[DATA_POINT_ALL];
 
-	// float the1_1[DATA_POINT_ALL];
-	// float the2_1[DATA_POINT_ALL];
-	// float the3_1[DATA_POINT_ALL];
-
-	// float the1_2[DATA_POINT_ALL];
-	// float the2_2[DATA_POINT_ALL];
-	// float the3_2[DATA_POINT_ALL];
-
-	// float the1_3[DATA_POINT_ALL];
-	// float the2_3[DATA_POINT_ALL];
-	// float the3_3[DATA_POINT_ALL];
-
-	// float the1_4[DATA_POINT_ALL];
-	// float the2_4[DATA_POINT_ALL];
-	// float the3_4[DATA_POINT_ALL];
-
-	// float the1_5[DATA_POINT_ALL];
-	// float the2_5[DATA_POINT_ALL];
-	// float the3_5[DATA_POINT_ALL];
-
-	// float the1_6[DATA_POINT_ALL];
-	// float the2_6[DATA_POINT_ALL];
-	// float the3_6[DATA_POINT_ALL];
-
 	int pwm1[DATA_POINT_ALL];
 	int pwm2[DATA_POINT_ALL];
 	int pwm3[DATA_POINT_ALL];
-
-	// int pwm1_1[DATA_POINT_ALL];
-	// int pwm2_1[DATA_POINT_ALL];
-	// int pwm3_1[DATA_POINT_ALL];
-
-	// int pwm1_2[DATA_POINT_ALL];
-	// int pwm2_2[DATA_POINT_ALL];
-	// int pwm3_2[DATA_POINT_ALL];
-
-	// int pwm1_3[DATA_POINT_ALL];
-	// int pwm2_3[DATA_POINT_ALL];
-	// int pwm3_3[DATA_POINT_ALL];
-
-	// int pwm1_4[DATA_POINT_ALL];
-	// int pwm2_4[DATA_POINT_ALL];
-	// int pwm3_4[DATA_POINT_ALL];
-
-	// int pwm1_5[DATA_POINT_ALL];
-	// int pwm2_5[DATA_POINT_ALL];
-	// int pwm3_5[DATA_POINT_ALL];
-
-	// int pwm1_6[DATA_POINT_ALL];
-	// int pwm2_6[DATA_POINT_ALL];
-	// int pwm3_6[DATA_POINT_ALL];
 
 	/// Steer to lef CCW //
 	for (int i=0; i < 7; i++){
@@ -1401,25 +1260,6 @@ void HexapodLib::generate_normalWalking_LUT(){
 		memcpy(normalWalking_PWM_LUT[i][15], pwm1, sizeof(normalWalking_PWM_LUT[i][15]));
 		memcpy(normalWalking_PWM_LUT[i][16], pwm2, sizeof(normalWalking_PWM_LUT[i][16]));
 		memcpy(normalWalking_PWM_LUT[i][17], pwm3, sizeof(normalWalking_PWM_LUT[i][17]));
-
-		// memcpy(normalWalking_THETA_LUT[i][0], the1_1, sizeof(normalWalking_THETA_LUT[i][0]));
-		// memcpy(normalWalking_THETA_LUT[i][1], the2_1, sizeof(normalWalking_THETA_LUT[i][1]));
-		// memcpy(normalWalking_THETA_LUT[i][2], the3_1, sizeof(normalWalking_THETA_LUT[i][2]));
-		// memcpy(normalWalking_THETA_LUT[i][3], the1_2, sizeof(normalWalking_THETA_LUT[i][3]));
-		// memcpy(normalWalking_THETA_LUT[i][4], the2_2, sizeof(normalWalking_THETA_LUT[i][4]));
-		// memcpy(normalWalking_THETA_LUT[i][5], the3_2, sizeof(normalWalking_THETA_LUT[i][5]));
-		// memcpy(normalWalking_THETA_LUT[i][6], the1_3, sizeof(normalWalking_THETA_LUT[i][6]));
-		// memcpy(normalWalking_THETA_LUT[i][7], the2_3, sizeof(normalWalking_THETA_LUT[i][7]));
-		// memcpy(normalWalking_THETA_LUT[i][8], the3_3, sizeof(normalWalking_THETA_LUT[i][8]));
-		// memcpy(normalWalking_THETA_LUT[i][9], the1_4, sizeof(normalWalking_THETA_LUT[i][9]));
-		// memcpy(normalWalking_THETA_LUT[i][10], the2_4, sizeof(normalWalking_THETA_LUT[i][10]));
-		// memcpy(normalWalking_THETA_LUT[i][11], the3_4, sizeof(normalWalking_THETA_LUT[i][11]));
-		// memcpy(normalWalking_THETA_LUT[i][12], the1_5, sizeof(normalWalking_THETA_LUT[i][12]));
-		// memcpy(normalWalking_THETA_LUT[i][13], the2_5, sizeof(normalWalking_THETA_LUT[i][13]));
-		// memcpy(normalWalking_THETA_LUT[i][14], the3_5, sizeof(normalWalking_THETA_LUT[i][14]));
-		// memcpy(normalWalking_THETA_LUT[i][15], the1_6, sizeof(normalWalking_THETA_LUT[i][15]));
-		// memcpy(normalWalking_THETA_LUT[i][16], the2_6, sizeof(normalWalking_THETA_LUT[i][16]));
-		// memcpy(normalWalking_THETA_LUT[i][17], the3_6, sizeof(normalWalking_THETA_LUT[i][17]));
 
 	}
 
