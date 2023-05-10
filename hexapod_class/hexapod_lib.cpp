@@ -3,19 +3,12 @@
 
 HexapodLib::HexapodLib(){
 
-	// generate_crabWalkingLUT();
-
-	// init_normal_walking();
-	PWM1_home = kinAngle_To_servoPwm(0, 0.0);
-	PWM2_home = kinAngle_To_servoPwm(1, 14.13);
-	PWM3_home = kinAngle_To_servoPwm(2, -96.59);
+	inv(X_home, Y_home, Z_home, theta1_home, theta2_home, theta3_home);
 
 
-	/////////////////////////
-	/// In-place turining ///
-	/////////////////////////
-	// generate_inplaceTurning_LUT();
-
+	PWM1_home = kinAngle_To_servoPwm(0, theta1_home*RAD2DEG);    // 0.0
+	PWM2_home = kinAngle_To_servoPwm(1, theta2_home*RAD2DEG);    // 14.13
+	PWM3_home = kinAngle_To_servoPwm(2, theta3_home*RAD2DEG);    // -96/59
 
 }
 void HexapodLib::fwd(float theta1, float theta2, float theta3, float& x, float& y, float& z){

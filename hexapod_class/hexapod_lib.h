@@ -32,6 +32,18 @@ private:
 	float L2 = 80;
 	float L3 = 171;
 
+	// X_home, Y_home, Z_home : home position of foot tip in leg frame
+	// theta1,2,3_home : home angle of leg (kinematics angle) 
+	float X_home = 160.0;
+	float Y_home = 0.0;
+	float Z_home = -150.0;
+
+	float theta1_home; //= 0.0;
+	float theta2_home; //= 14.13 * DEG2RAD;
+	float theta3_home; //= -96.59 * DEG2RAD;
+
+	float XYZ_home[3] = {X_home, Y_home, Z_home};
+
 	//////////////////////////
 	/// walking parameters ///
 	//////////////////////////
@@ -43,11 +55,11 @@ private:
 		x_start : X starting position before walking
 	*/
 	/// foot's path //
-	float S = -150; // starting point offset from 0 (in Z-axis)
+	float S = Z_home; // starting point offset from 0 (in Z-axis)
 	float T = 100;  // step distance (how far the foot will move in Y-axis)
 	float A = 50;   // step height (how the foot will lift from ground in Z-axis)
 
-	float x_start = 160.0;
+	float x_start = X_home; // 160.0
 
 	/// walk rotation matrix ///
 	// rotation angle to rotation foot path of each leg
@@ -68,16 +80,6 @@ private:
 	// C2 : distance between body center point C to leg j,k,m,n frame
 	float C1 = 118.4;
 	float C2 = 143.54;
-
-	// X_home, Y_home, Z_home : home position of foot tip in leg frame
-	// theta1,2,3_home : home angle of leg (kinematics angle) 
-	float X_home = 160.0;
-	float Y_home = 0.0;
-	float Z_home = -150.0;
-	float theta1_home = 0.0;
-	float theta2_home = 14.13 * DEG2RAD;
-	float theta3_home = -96.59 * DEG2RAD;
-	float XYZ_home[3] = {X_home, Y_home, Z_home};
 
 	/// Leg's angle offset and rotation matrices /// 
 	float leg1_ang_offset = 0.0;
@@ -143,8 +145,8 @@ private:
 	/// Normal walking steering ///
 	///////////////////////////////
 	float curve_path = T;
-	float R_icc_max = 3000.0;
-	float R_icc_min = 600.0;
+	float R_icc_max = 3000.0; //3000
+	float R_icc_min = 600.0;  //600
 
 
 public: 

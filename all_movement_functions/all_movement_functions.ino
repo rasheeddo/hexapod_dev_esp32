@@ -50,7 +50,8 @@ int sbus_db_min = 976;
 /// Hexapod  ///
 ////////////////
 int delay_time = 25;
-int counter = 0;
+int walk_counter = 0;
+int turn_counter = 0;
 int ang_inc = 0;
 int str_index = 7;
 int turn_inc = 0;
@@ -67,6 +68,7 @@ int max_delay = 50;
 int min_delay = 10;
 int default_delay = 25;
 bool from_walk = false;
+bool start_drive = false;
 
 // mode //
 char *robot_mode[] = {"NORM", "CRAB", "BODY"};
@@ -363,17 +365,24 @@ void loop() {
   period = millis() - last_stamp;
   if ((period >= delay_time) && (sticks_pressed)) {
 
+    if (start_drive){
+      walk_counter = (int)DATA_POINT_ALL/4;
+      start_drive = false;
+    }
+
     /////////////////////////////////
     // normal-walking LUT counting //
     /////////////////////////////////
     if (robot_mode_index == 0){
       
-      if (counter < DATA_POINT_ALL){
-        setNormalWalkingPWM(str_index, counter);
-        counter++;
+      if (walk_counter < DATA_POINT_ALL){
+        setNormalWalkingPWM(str_index, walk_counter);
+        walk_counter++;
       } else {
-        counter = 0;
+        walk_counter = 0;
       }
+
+      smooth_gain = 0.85;
       
     } 
     /////////////////////////////////////////
@@ -383,23 +392,24 @@ void loop() {
 
       // crab-walking //
       if (stick_ch2_pressed){
-        if (counter < DATA_POINT_ALL){
-          setCrabWalkingPWM(ang_inc, counter);
-          counter++;
+        if (walk_counter < DATA_POINT_ALL){
+          setCrabWalkingPWM(ang_inc, walk_counter);
+          walk_counter++;
         } else {
-          counter = 0;
+          walk_counter = 0;
         }
       }
       // turning //
       else if (stick_ch4_pressed){
-        if (counter < DATA_POINT_TURN_ALL){
-          setInPlaceTurningPWM(turn_inc, counter);
-          counter++;
+        if (turn_counter < DATA_POINT_TURN_ALL){
+          setInPlaceTurningPWM(turn_inc, turn_counter);
+          turn_counter++;
         } else {
-          counter = 0;
+          turn_counter = 0;
         }
       }
-      
+
+      smooth_gain = 0.65;
       
     } 
     /////////////////////////////////
@@ -440,18 +450,12 @@ void loop() {
     
   } else if (sticks_pressed == false) {
     
-//    if ((from_walk) && (period > 1000)){
-//      Serial.print("set home ********************************");
-//      setHomePWM();
-//      if (period > 3000){
-//        from_walk = false;
-//      }
-//    }
-    
     setHomePWM();
     from_walk = false;
-    counter = 0;
+    walk_counter = 0;
+    turn_counter = 0;
     do_smooth = true;
+    start_drive = true;
     last_home_stamp = millis();
     
     
@@ -467,29 +471,29 @@ void loop() {
   //////////////////// 
   if (do_smooth == true) {
 
-    pwm1_1 = smoothingPWM(pwm1_1, pwm1_1_prev);
-    pwm2_1 = smoothingPWM(pwm2_1, pwm2_1_prev);
-    pwm3_1 = smoothingPWM(pwm3_1, pwm3_1_prev);
+    pwm1_1 = smoothingPWM(smooth_gain, pwm1_1, pwm1_1_prev);
+    pwm2_1 = smoothingPWM(smooth_gain, pwm2_1, pwm2_1_prev);
+    pwm3_1 = smoothingPWM(smooth_gain, pwm3_1, pwm3_1_prev);
 
-    pwm1_2 = smoothingPWM(pwm1_2, pwm1_2_prev);
-    pwm2_2 = smoothingPWM(pwm2_2, pwm2_2_prev);
-    pwm3_2 = smoothingPWM(pwm3_2, pwm3_2_prev);
+    pwm1_2 = smoothingPWM(smooth_gain, pwm1_2, pwm1_2_prev);
+    pwm2_2 = smoothingPWM(smooth_gain, pwm2_2, pwm2_2_prev);
+    pwm3_2 = smoothingPWM(smooth_gain, pwm3_2, pwm3_2_prev);
 
-    pwm1_3 = smoothingPWM(pwm1_3, pwm1_3_prev);
-    pwm2_3 = smoothingPWM(pwm2_3, pwm2_3_prev);
-    pwm3_3 = smoothingPWM(pwm3_3, pwm3_3_prev);
+    pwm1_3 = smoothingPWM(smooth_gain, pwm1_3, pwm1_3_prev);
+    pwm2_3 = smoothingPWM(smooth_gain, pwm2_3, pwm2_3_prev);
+    pwm3_3 = smoothingPWM(smooth_gain, pwm3_3, pwm3_3_prev);
 
-    pwm1_4 = smoothingPWM(pwm1_4, pwm1_4_prev);
-    pwm2_4 = smoothingPWM(pwm2_4, pwm2_4_prev);
-    pwm3_4 = smoothingPWM(pwm3_4, pwm3_4_prev);
+    pwm1_4 = smoothingPWM(smooth_gain, pwm1_4, pwm1_4_prev);
+    pwm2_4 = smoothingPWM(smooth_gain, pwm2_4, pwm2_4_prev);
+    pwm3_4 = smoothingPWM(smooth_gain, pwm3_4, pwm3_4_prev);
 
-    pwm1_5 = smoothingPWM(pwm1_5, pwm1_5_prev);
-    pwm2_5 = smoothingPWM(pwm2_5, pwm2_5_prev);
-    pwm3_5 = smoothingPWM(pwm3_5, pwm3_5_prev);
+    pwm1_5 = smoothingPWM(smooth_gain, pwm1_5, pwm1_5_prev);
+    pwm2_5 = smoothingPWM(smooth_gain, pwm2_5, pwm2_5_prev);
+    pwm3_5 = smoothingPWM(smooth_gain, pwm3_5, pwm3_5_prev);
 
-    pwm1_6 = smoothingPWM(pwm1_6, pwm1_6_prev);
-    pwm2_6 = smoothingPWM(pwm2_6, pwm2_6_prev);
-    pwm3_6 = smoothingPWM(pwm3_6, pwm3_6_prev);
+    pwm1_6 = smoothingPWM(smooth_gain, pwm1_6, pwm1_6_prev);
+    pwm2_6 = smoothingPWM(smooth_gain, pwm2_6, pwm2_6_prev);
+    pwm3_6 = smoothingPWM(smooth_gain, pwm3_6, pwm3_6_prev);
   }
   
   pwm1_1_prev = pwm1_1;
@@ -532,36 +536,40 @@ void loop() {
 //  Serial.print(ch7);
 //  Serial.print(" ch5 ");
 //  Serial.print(ch5);
-//  Serial.print(" smooth ");
-//  Serial.print(do_smooth);
-//  Serial.print(" count ");
-//  Serial.print(counter);
-//  Serial.print(" delay ");
-//  Serial.print(delay_time);
-//  Serial.print(" ang_in ");
-//  Serial.print(ang_inc);
-//  Serial.print(" turn_in ");
-//  Serial.print(turn_inc);
-//  Serial.print(" str_in ");
-//  Serial.print(str_index);
+  Serial.print(" smooth ");
+  Serial.print(do_smooth);
+  Serial.print(" smooth_K ");
+  Serial.print(smooth_gain);
+  Serial.print(" walk_counter ");
+  Serial.print(walk_counter);
+  Serial.print(" turn_counter ");
+  Serial.print(turn_counter);
+  Serial.print(" delay ");
+  Serial.print(delay_time);
+  Serial.print(" ang_in ");
+  Serial.print(ang_inc);
+  Serial.print(" turn_in ");
+  Serial.print(turn_inc);
+  Serial.print(" str_in ");
+  Serial.print(str_index);
 //  Serial.print(" r ");
 //  Serial.print(roll);
 //  Serial.print(" p ");
 //  Serial.print(pitch);
 //  Serial.print(" yw ");
 //  Serial.print(yaw);
-  Serial.print("   imu_roll: ");
-  Serial.print(imu_roll, 2);
-  Serial.print(" imu_pitch: ");
-  Serial.print(imu_pitch, 2);
-  Serial.print(" pid_in_roll ");
-  Serial.print( PIDRollInput);
-  Serial.print(" pid_out_roll ");
-  Serial.print( PIDRollOutput);
-  Serial.print(" pid_in_pitch ");
-  Serial.print( PIDPitchInput);
-  Serial.print(" pid_out_pitch ");
-  Serial.println( PIDPitchOutput);
+//  Serial.print("   imu_roll: ");
+//  Serial.print(imu_roll, 2);
+//  Serial.print(" imu_pitch: ");
+//  Serial.print(imu_pitch, 2);
+//  Serial.print(" pid_in_roll ");
+//  Serial.print( PIDRollInput);
+//  Serial.print(" pid_out_roll ");
+//  Serial.print( PIDRollOutput);
+//  Serial.print(" pid_in_pitch ");
+//  Serial.print( PIDPitchInput);
+//  Serial.print(" pid_out_pitch ");
+//  Serial.println( PIDPitchOutput);
 //  Serial.print(" body_yaw: ");
 //  Serial.print(body_yaw, 2);
 //  Serial.print("   comp_roll: ");
@@ -574,6 +582,8 @@ void loop() {
 //  Serial.print(y_trans);
 //  Serial.print(" z ");
 //  Serial.print(z_trans);
+
+  Serial.println(" ");
 
   
 //  delay(1);
@@ -740,7 +750,7 @@ void init_global_PWM() {
   pwm3_6_prev = pwm3_6;
 }
 
-int smoothingPWM(int new_pwm, int old_pwm) {
+int smoothingPWM(float smooth_gain, int new_pwm, int old_pwm) {
   int pwm_out;
   pwm_out = (int)((smooth_gain) * old_pwm + (1-smooth_gain) * new_pwm);
 
